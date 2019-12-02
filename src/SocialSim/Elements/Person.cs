@@ -8,8 +8,6 @@ using System.Data.SqlTypes;
 
 namespace SocialSim.Elements
 {
-
-
     /// <summary>
     /// Person class contains basic information that each person should have
     /// This plays role of basic unit in the simulation
@@ -23,7 +21,7 @@ namespace SocialSim.Elements
         /// <param name="selflessness"> Degree pf selflessness of this person </param>
         /// <param name="selfishness"> Degree of selfishness of this person </param>
         /// <param name="money"> Degree of health of this person Only </param>
-        /// <param name= " power"> Amount of social power this person has </param>
+        /// <param name="power"> Amount of social power this person has </param>
         public Person(uint id, float selflessness, float selfishness, int money, uint power)
         {
             Id= id;

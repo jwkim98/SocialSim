@@ -90,6 +90,11 @@ namespace SocialSim.Elements
             return new Tuple<uint, uint>(_relationshipAtoB.From, _relationshipBtoA.From);
         }
 
+        public Tuple<Relationship, Relationship> GetRelationshipTuple()
+        {
+            return new Tuple<Relationship, Relationship>(_relationshipAtoB, _relationshipBtoA);
+        }
+
         private readonly Relationship _relationshipAtoB;
         private readonly Relationship _relationshipBtoA;
     }
