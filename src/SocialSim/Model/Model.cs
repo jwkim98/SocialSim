@@ -36,7 +36,7 @@ namespace SocialSim.Model
         public virtual double ComputeActionDegree(Person subjectPerson, Relationship relationship)
         {
             return subjectPerson.Selflessness + subjectPerson.Selfishness * (relationship.Relation - 1)
-                                              + Hyperparameters.RandomDegree * Random.NextDouble();
+                                              + Hyperparameter.RandomDegree * Random.NextDouble();
         }
 
         /// <summary>
@@ -65,28 +65,146 @@ namespace SocialSim.Model
             Relationship relationshipB = relationshipDescriptor.GetRelationship(idTuple.Item2);
             double minRelation = Math.Min(relationshipA.Frequency, relationshipB.Frequency);
 
-            return minRelation + Hyperparameters.RelationDegree * (minRelation + 1) +
-                   Hyperparameters.RandomDegree * Random.NextDouble();
+            return minRelation + Hyperparameter.RelationDegree * (minRelation + 1) +
+                   Hyperparameter.RandomDegree * Random.NextDouble();
         }
 
+        /// <summary>
+        /// Computes action between two people and updates given reference parameters
+        /// </summary>
+        /// <param name="firstPerson"> First person object </param>
+        /// <param name="secondPerson">Second person object </param>
+        /// <param name="firstRelationship"> Relationship from first person to second person </param>
+        /// <param name="secondRelationship"> Relationship from second person to first person </param>
+        /// <param name="firstStance"> Stance of first person </param>
+        /// <param name="secondStance"> Stance of second person </param>
         public virtual void ComputeAction(ref Person firstPerson, ref Person secondPerson,
             ref Relationship firstRelationship,
             ref Relationship secondRelationship, Stance firstStance,
             Stance secondStance)
         {
+            Random random = new Random();
+
             if (firstStance == Stance.Evil && secondStance == Stance.Evil)
             {
-                //TODO : think about the action
+                double victoryProbFirst = (double) firstPerson.Power / (firstPerson.Power + secondPerson.Power);
+                double randomThreshold = random.NextDouble();
+
+                int toSteal = random.Next(Hyperparameter.MinimumStealBetweenEvil,
+                    Hyperparameter.MaximumStealBetweenEvil);
+
+                double relationshipDecreaseAmount = (double) (toSteal - Hyperparameter.MinimumStealBetweenEvil) /
+                                                    (Hyperparameter.MaximumStealBetweenEvil -
+                                                     Hyperparameter.MinimumStealBetweenEvil);
+
+                if (relationshipDecreaseAmount < Hyperparameter.MinimumRelationshipDecreaseBetweenEvil)
+                {
+                    relationshipDecreaseAmount = Hyperparameter.MinimumRelationshipDecreaseBetweenEvil;
+                }
+
+                if (randomThreshold < victoryProbFirst)
+                {
+                    if (secondPerson.Money > toSteal)
+                    {
+                        firstPerson.Money += toSteal;
+                        secondPerson.Money -= toSteal;
+                    }
+                    else
+                    {
+                        firstPerson.Money += secondPerson.Money;
+                        secondPerson.Money = 0;
+                    }
+
+                    Relationship relationship = secondPerson.GetRelationshipTo(firstPerson.Id);
+                    relationship.Relation -= relationshipDecreaseAmount;
+                    secondPerson.SetRelationship(relationship, firstPerson.Id);
+                }
+                else
+                {
+                    if (firstPerson.Money > toSteal)
+                    {
+                        firstPerson.Money -= toSteal;
+                        secondPerson.Money += toSteal;
+                    }
+                    else
+                    {
+                        secondPerson.Money += firstPerson.Money;
+                        firstPerson.Money = 0;
+                    }
+
+                    Relationship relationship = firstPerson.GetRelationshipTo(secondPerson.Id);
+                    relationship.Relation -= relationshipDecreaseAmount;
+                    firstPerson.SetRelationship(relationship, secondPerson.Id);
+                }
             }
 
             if (firstStance == Stance.Good && secondStance == Stance.Evil)
             {
-                //TODO : think about the action
+                int toSteal = random.Next(Hyperparameter.MinimumStealBetweenGoodEvil,
+                    Hyperparameter.MaximumStealBetweenGoodEvil);
+
+                double relationshipDecreaseAmount = (double)(toSteal - Hyperparameter.MinimumStealBetweenEvil) /
+                                                    (Hyperparameter.MaximumStealBetweenEvil -
+                                                     Hyperparameter.MinimumStealBetweenEvil);
+                if (relationshipDecreaseAmount < Hyperparameter.MinimumRelationshipDecreaseGoodEvil)
+                {
+                    relationshipDecreaseAmount = Hyperparameter.MinimumRelationshipDecreaseGoodEvil;
+                }
+
+                if (firstPerson.Money > toSteal)
+                {
+                    firstPerson.Money += toSteal;
+                    secondPerson.Money -= toSteal;
+                }
+                else
+                {
+                    firstPerson.Money += secondPerson.Money;
+                    secondPerson.Money = 0;
+                }
+
+                Relationship relationship = firstPerson.GetRelationshipTo(secondPerson.Id);
+                relationship.Relation -= relationshipDecreaseAmount;
+                firstPerson.SetRelationship(relationship, secondPerson.Id);
             }
 
-            if (firstStance == Stance.Good && secondStance == Stance.Evil)
+            if (firstStance == Stance.Evil && secondStance == Stance.Good)
             {
+                int toSteal = random.Next(Hyperparameter.MinimumStealBetweenGoodEvil,
+                    Hyperparameter.MaximumStealBetweenGoodEvil);
 
+                double relationshipDecreaseAmount = (double)(toSteal - Hyperparameter.MinimumStealBetweenEvil) /
+                                                    (Hyperparameter.MaximumStealBetweenEvil -
+                                                     Hyperparameter.MinimumStealBetweenEvil);
+                if (relationshipDecreaseAmount < Hyperparameter.MinimumRelationshipDecreaseGoodEvil)
+                {
+                    relationshipDecreaseAmount = Hyperparameter.MinimumRelationshipDecreaseGoodEvil;
+                }
+
+                if (secondPerson.Money > toSteal)
+                {
+                    secondPerson.Money += toSteal;
+                    firstPerson.Money -= toSteal;
+                }
+                else
+                {
+                    secondPerson.Money += firstPerson.Money;
+                    firstPerson.Money = 0;
+                }
+
+                Relationship relationship = secondPerson.GetRelationshipTo(firstPerson.Id);
+                relationship.Relation -= relationshipDecreaseAmount;
+                secondPerson.SetRelationship(relationship, firstPerson.Id);
+            }
+
+            if (firstStance == Stance.Good && secondStance == Stance.Good)
+            {
+                Relationship firstToSecondRelationship = firstPerson.GetRelationshipTo(secondPerson.Id);
+                Relationship secondToFirstRelationship = secondPerson.GetRelationshipTo(firstPerson.Id);
+                firstToSecondRelationship.Relation *= 1.1;
+                secondToFirstRelationship.Relation *= 1.1;
+
+                firstPerson.SetRelationship(firstToSecondRelationship, secondPerson.Id);
+                secondPerson.SetRelationship(secondToFirstRelationship, firstPerson.Id);
             }
         }
 

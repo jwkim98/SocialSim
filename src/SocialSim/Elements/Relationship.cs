@@ -57,7 +57,7 @@ namespace SocialSim.Elements
         /// </summary>
         /// <param name="personId"></param>
         /// <returns></returns>
-        public bool HasRelationShip(uint personId)
+        public bool HasRelationShip(int personId)
         {
             if (_relationshipAtoB.From == personId || _relationshipBtoA.From == personId)
                 return true;
@@ -70,7 +70,7 @@ namespace SocialSim.Elements
         /// </summary>
         /// <param name="personId"> Id of the person </param>
         /// <returns> Relationship object between two people respect to given personId </returns>
-        public Relationship GetRelationship(uint personId)
+        public Relationship GetRelationship(int personId)
         {
             if (!HasRelationShip(personId))
                 throw new ArgumentException("No such personId defined in this RelationShipDescriptor");
@@ -84,7 +84,7 @@ namespace SocialSim.Elements
         /// </summary>
         /// <param name="personId"> PersonID </param>
         /// <param name="relationship"></param>
-        public void SetRelationship(uint personId, Relationship relationship)
+        public void SetRelationship(int personId, Relationship relationship)
         {
             if (!HasRelationShip(personId))
                 throw new ArgumentException("No such personId to update in this RelationshipDescriptor");

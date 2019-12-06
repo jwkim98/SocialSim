@@ -44,7 +44,7 @@ namespace SocialSim.Engine
                 var minFrequency = Math.Min(relationShipTuple.Item1.Frequency, relationShipTuple.Item2.Frequency);
                 var randValue = rand.NextDouble();
 
-                Tuple<uint, uint> peopleIdTuple = relationShipDescriptor.GetPeopleIdTuple();
+                Tuple<int, int> peopleIdTuple = relationShipDescriptor.GetPeopleIdTuple();
 
                 Person subjectPerson = PeopleList.Find(person => person.Id == peopleIdTuple.Item1);
                 Person targetPerson = PeopleList.Find(person => person.Id == peopleIdTuple.Item2);

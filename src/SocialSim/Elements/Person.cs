@@ -31,7 +31,7 @@ namespace SocialSim.Elements
             Selfishness = selfishness;
             Money = money;
             Power = power;
-            RelationshipList = new List<Relationship>(Hyperparameters.MaxRelationshipCount);
+            RelationshipList = new List<Relationship>(Hyperparameter.MaxRelationshipCount);
         }
 
         /// <summary>
