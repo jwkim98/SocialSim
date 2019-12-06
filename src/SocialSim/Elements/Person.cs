@@ -44,6 +44,22 @@ namespace SocialSim.Elements
         }
 
         /// <summary>
+        /// Checks if this person has relationship with given person ID
+        /// </summary>
+        /// <param name="personId"> Person ID to find relationship for</param>
+        /// <returns> True if this person has relationship with id with personId false if not </returns>
+        public bool HasRelationship(int personId)
+        {
+            foreach (Relationship relationship in RelationshipList)
+            {
+                if (relationship.To == personId)
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Sets relationship between people
         /// </summary>
         /// <param name="relationship"> relationship from this person to other </param>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO.Enumeration;
 using System.Reflection.Metadata;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using SocialSim.Elements;
 using SocialSim.Model;
@@ -41,7 +42,7 @@ namespace SocialSim.Engine
         {
             int size = PeopleList.Count;
             for (int index = 0; index < size; ++index)
-            { 
+            {
                 PeopleList[index].ClearRelationships();
             }
         }
@@ -56,7 +57,7 @@ namespace SocialSim.Engine
 
             int size = subjectPerson.RelationshipList.Count;
 
-            for(int index = 0; index < size; ++index)
+            for (int index = 0; index < size; ++index)
             {
                 Relationship subjectRelationship = subjectPerson.RelationshipList[index];
                 double meetProb = subjectRelationship.Frequency;
@@ -75,7 +76,8 @@ namespace SocialSim.Engine
                 Stance subjectStance = _model.GetStance(subjectActionDegree);
                 Stance targetStance = _model.GetStance(targetActionDegree);
 
-                _model.ComputeAction(ref subjectPerson, ref targetPerson, ref subjectRelationship, ref targetRelationship,
+                _model.ComputeAction(ref subjectPerson, ref targetPerson, ref subjectRelationship,
+                    ref targetRelationship,
                     subjectStance, targetStance);
 
                 subjectRelationship.HasComputed = true;
@@ -89,12 +91,29 @@ namespace SocialSim.Engine
             }
         }
 
-        public void Rumor(int personIndex)
+        public void Rumor(int subjectPersonId, int targetPersonId)
         {
-            Person person = PeopleList[personIndex];
-            int descriptorIndex = personIndex / 2;
+            Person subjectPerson = PeopleList[subjectPersonId];
+            int relationshipSize = subjectPerson.RelationshipList.Count;
 
-            // Relationship relationship = RelationShipDescriptorList[descriptorIndex].GetRelationship(person.Id);
+            Relationship relationshipToTarget = subjectPerson.GetRelationshipTo(targetPersonId);
+            double relationshipUpdateAmount = 0;
+
+            for (int index = 0; index < relationshipSize; ++index)
+            {
+                if (index == targetPersonId)
+                    continue;
+
+                if (PeopleList[subjectPerson.RelationshipList[index].To].HasRelationship(targetPersonId))
+                {
+                    relationshipUpdateAmount += PeopleList[subjectPerson.RelationshipList[index].To]
+                        .GetRelationshipTo(targetPersonId).UpdateAmount;
+                }
+            }
+
+            double rumor = (relationshipToTarget.Relation + 1) * relationshipUpdateAmount;
+            // TODO : How should we normalize this?
+            relationshipToTarget.Relation -= rumor;
         }
 
         public List<RelationshipDescriptor> RelationShipDescriptorList { get; set; }
