@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Design.Serialization;
 using System.Dynamic;
 using System.Text;
 using System.Collections.Concurrent;
 using System.Data.SqlTypes;
+using SocialSim.Model;
 
 namespace SocialSim.Elements
 {
@@ -22,22 +24,35 @@ namespace SocialSim.Elements
         /// <param name="selfishness"> Degree of selfishness of this person </param>
         /// <param name="money"> Degree of health of this person Only </param>
         /// <param name="power"> Amount of social power this person has </param>
-        public Person(uint id, float selflessness, float selfishness, int money, uint power)
+        public Person(int id, float selflessness, float selfishness, int money, uint power)
         {
             Id= id;
             Selflessness = selflessness;
             Selfishness = selfishness;
             Money = money;
             Power = power;
+            RelationshipList = new List<Relationship>(Hyperparameters.MaxRelationshipCount);
         }
 
         /// <summary>
         /// Adds relationship to the person
         /// </summary>
         /// <param name="relationship"> relationship between people </param>
-        public void AddRelationShip(Relationship relationship)
+        public void AddRelationship(Relationship relationship)
         {
-            _relationships.Add(relationship);
+            RelationshipList.Add(relationship);
+        }
+
+        public void SetRelationship(Relationship relationship, int targetPersonId)
+        {
+            int size = RelationshipList.Count;
+            for (int index = 0; index < size; ++index)
+            {
+                if (RelationshipList[index].To == targetPersonId)
+                {
+                    RelationshipList[index] = relationship;
+                }
+            }
         }
 
         /// <summary>
@@ -46,10 +61,27 @@ namespace SocialSim.Elements
         /// <returns> Enumerator of the relationship </returns>
         public IEnumerator<Relationship> GetRelationshipEnumerator()
         {
-            return _relationships.GetEnumerator();
+            return RelationshipList.GetEnumerator();
         }
 
-        public uint Id { get; }
+        /// <summary>
+        /// Gets relationship with target person ID given as parameter
+        /// </summary>
+        /// <param name="targetPersonId"> Person's ID to search for </param>
+        /// <returns> relationship with target person Id with targetPersonId </returns>
+        public Relationship GetRelationshipTo(int targetPersonId)
+        {
+            foreach (Relationship relationship in RelationshipList)
+            {
+                if (relationship.To == targetPersonId)
+                {
+                    return relationship;
+                }
+            }
+            return new Relationship(Id, targetPersonId, 0, 0);
+        }
+
+        public int Id { get; }
 
         public int Money;
 
@@ -59,7 +91,7 @@ namespace SocialSim.Elements
 
         public float Selfishness { get; }
 
-        private ConcurrentBag<Relationship> _relationships;
+        public List<Relationship> RelationshipList { get; }
 
     }
 }

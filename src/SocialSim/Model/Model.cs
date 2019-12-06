@@ -36,7 +36,7 @@ namespace SocialSim.Model
         public virtual double ComputeActionDegree(Person subjectPerson, Relationship relationship)
         {
             return subjectPerson.Selflessness + subjectPerson.Selfishness * (relationship.Relation - 1)
-                                              + Hyperparemeters.RandomDegree * Random.NextDouble();
+                                              + Hyperparameters.RandomDegree * Random.NextDouble();
         }
 
         /// <summary>
@@ -60,18 +60,19 @@ namespace SocialSim.Model
         /// <returns></returns>
         public virtual double ComputeEncounterDegree(RelationshipDescriptor relationshipDescriptor)
         {
-            Tuple<uint, uint> idTuple = relationshipDescriptor.GetPeopleIdTuple();
+            Tuple<int, int> idTuple = relationshipDescriptor.GetPeopleIdTuple();
             Relationship relationshipA = relationshipDescriptor.GetRelationship(idTuple.Item1);
             Relationship relationshipB = relationshipDescriptor.GetRelationship(idTuple.Item2);
             double minRelation = Math.Min(relationshipA.Frequency, relationshipB.Frequency);
 
-            return minRelation + Hyperparemeters.RelationDegree * (minRelation + 1) +
-                   Hyperparemeters.RandomDegree * Random.NextDouble();
+            return minRelation + Hyperparameters.RelationDegree * (minRelation + 1) +
+                   Hyperparameters.RandomDegree * Random.NextDouble();
         }
 
-        public virtual void ComputeAction(ref Person firstPerson, ref Person secondPerson, ref Relationship firstRelationship,
-            ref Relationship secondRelationship, ref Stance firstStance,
-            ref Stance secondStance)
+        public virtual void ComputeAction(ref Person firstPerson, ref Person secondPerson,
+            ref Relationship firstRelationship,
+            ref Relationship secondRelationship, Stance firstStance,
+            Stance secondStance)
         {
             if (firstStance == Stance.Evil && secondStance == Stance.Evil)
             {

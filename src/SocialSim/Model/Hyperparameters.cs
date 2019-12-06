@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SocialSim.Model
 {
-    class Hyperparemeters
+    class Hyperparameters
     {
         /// <summary>
         ///  Degree of random value being multiplied
@@ -12,5 +12,7 @@ namespace SocialSim.Model
         public static double RandomDegree = 1;
 
         public static double RelationDegree = 1;
+
+        public static int MaxRelationshipCount = 100;
     }
 }

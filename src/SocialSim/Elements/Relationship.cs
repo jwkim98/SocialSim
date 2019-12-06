@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SocialSim.Elements
 {
@@ -17,7 +15,7 @@ namespace SocialSim.Elements
         /// <param name="to"> Id of the person that this relationship is targeting </param>
         /// <param name="relation"> Indicates how close are people specified in the relationship object </param>
         /// <param name="frequency"> Indicates how often specified people in this Relationship object meet  </param>
-        public Relationship(uint from, uint to, double relation, uint frequency)
+        public Relationship(int from, int to, double relation, uint frequency)
         {
             From = from;
             To = to;
@@ -25,8 +23,8 @@ namespace SocialSim.Elements
             Frequency = frequency;
         }
 
-        public uint From { get; }
-        public uint To { get; }
+        public int From { get; }
+        public int To { get; }
         public double Relation;
         public float Frequency;
     }
@@ -104,9 +102,9 @@ namespace SocialSim.Elements
         /// Returns Tuple of Id of two people defined in this RelationShipDescriptor
         /// </summary>
         /// <returns> Tuple of Id of two people defined in this RelationShipDescriptor</returns>
-        public Tuple<uint, uint> GetPeopleIdTuple()
+        public Tuple<int, int> GetPeopleIdTuple()
         {
-            return new Tuple<uint, uint>(_relationshipAtoB.From, _relationshipBtoA.From);
+            return new Tuple<int, int>(_relationshipAtoB.From, _relationshipBtoA.From);
         }
 
         public Tuple<Relationship, Relationship> GetRelationshipTuple()
