@@ -4,6 +4,7 @@ using System.IO.Enumeration;
 using System.Reflection.Metadata;
 using System.Text;
 using SocialSim.Elements;
+using SocialSim.Model;
 
 
 namespace SocialSim.Engine
@@ -62,11 +63,45 @@ namespace SocialSim.Engine
             _temporaryPeopleList.Clear();
         }
 
+        /// <summary>
+        /// Computes action of two people when they meet together
+        /// </summary>
+        /// <param name="index"> index of relationship to compute</param>
+        /// <param name="firstOrSecond"> true if </param>
+        public void Meet(int index, bool firstOrSecond)
+        {
+            if (firstOrSecond)
+            {
+                var descriptor = _temporaryDescriptorList[index];
+                var firstPerson = _temporaryPeopleList[2 * index];
+                var secondPerson = _temporaryPeopleList[2 * index + 1];
+
+                Relationship firstRelationship = descriptor.GetRelationship(firstPerson.Id);
+                Relationship secondRelationship = descriptor.GetRelationship(secondPerson.Id);
+
+                double firstActionDegree = _model.ComputeActionDegree(firstPerson, firstRelationship);
+                double secondActionDegree = _model.ComputeActionDegree(secondPerson, secondRelationship);
+
+                Stance firstStance = _model.GetStance(firstActionDegree);
+                Stance secondStance = _model.GetStance(secondActionDegree);
+
+                _model.ComputeAction(ref firstPerson, ref secondPerson, ref firstRelationship, ref secondRelationship, ref firstStance, ref secondStance);
+
+                descriptor.SetRelationship(firstPerson.Id, firstRelationship);
+                descriptor.SetRelationship(secondPerson.Id, secondRelationship);
+
+                _temporaryDescriptorList[index] = descriptor;
+                _temporaryPeopleList[2 * index] = firstPerson;
+                _temporaryPeopleList[2 * index + 1] = secondPerson;
+
+            }
+        }
+
         public List<RelationshipDescriptor> RelationShipDescriptorList { get; set; }
 
         public List<Person> PeopleList { get; set; }
 
-        private Model.Model _model;
+        private readonly Model.Model _model;
 
         private List<RelationshipDescriptor> _temporaryDescriptorList;
 

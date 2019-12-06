@@ -50,10 +50,10 @@ namespace SocialSim.Elements
             }
             else
             {
-                throw new System.ArgumentException("relationship to each direction does not match");
+                throw new ArgumentException("relationship to each direction does not match");
             }
         }
-        
+
         /// <summary>
         /// Checks if this RelationshipDescriptor contains relationship of given personId
         /// </summary>
@@ -75,10 +75,29 @@ namespace SocialSim.Elements
         public Relationship GetRelationship(uint personId)
         {
             if (!HasRelationShip(personId))
-                throw new System.ArgumentException("No such personId defined in this RelationShipDescriptor");
+                throw new ArgumentException("No such personId defined in this RelationShipDescriptor");
             if (_relationshipAtoB.From == personId)
                 return _relationshipAtoB;
             return _relationshipBtoA;
+        }
+
+        /// <summary>
+        /// Sets new relationship for corresponding person. Throws ArgumentException if person ID has no matches
+        /// </summary>
+        /// <param name="personId"> PersonID </param>
+        /// <param name="relationship"></param>
+        public void SetRelationship(uint personId, Relationship relationship)
+        {
+            if (!HasRelationShip(personId))
+                throw new ArgumentException("No such personId to update in this RelationshipDescriptor");
+            if (_relationshipAtoB.From == personId)
+            {
+                _relationshipAtoB = relationship;
+            }
+            else
+            {
+                _relationshipBtoA = relationship;
+            }
         }
 
         /// <summary>
@@ -95,7 +114,7 @@ namespace SocialSim.Elements
             return new Tuple<Relationship, Relationship>(_relationshipAtoB, _relationshipBtoA);
         }
 
-        private readonly Relationship _relationshipAtoB;
-        private readonly Relationship _relationshipBtoA;
+        private Relationship _relationshipAtoB;
+        private Relationship _relationshipBtoA;
     }
 }
