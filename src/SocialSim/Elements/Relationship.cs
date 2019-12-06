@@ -25,6 +25,10 @@ namespace SocialSim.Elements
 
         public int From { get; }
         public int To { get; }
+
+        public double UpdateAmount { get; set; }
+        public bool HasComputed { get; set; }
+
         public double Relation;
         public float Frequency;
     }

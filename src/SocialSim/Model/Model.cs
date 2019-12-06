@@ -117,7 +117,8 @@ namespace SocialSim.Model
 
                     Relationship relationship = secondPerson.GetRelationshipTo(firstPerson.Id);
                     relationship.Relation -= relationshipDecreaseAmount;
-                    secondPerson.SetRelationship(relationship, firstPerson.Id);
+                    relationship.UpdateAmount = relationshipDecreaseAmount;
+                    secondPerson.SetRelationship(relationship);
                 }
                 else
                 {
@@ -134,7 +135,8 @@ namespace SocialSim.Model
 
                     Relationship relationship = firstPerson.GetRelationshipTo(secondPerson.Id);
                     relationship.Relation -= relationshipDecreaseAmount;
-                    firstPerson.SetRelationship(relationship, secondPerson.Id);
+                    relationship.UpdateAmount = relationshipDecreaseAmount;
+                    firstPerson.SetRelationship(relationship);
                 }
             }
 
@@ -143,7 +145,7 @@ namespace SocialSim.Model
                 int toSteal = random.Next(Hyperparameter.MinimumStealBetweenGoodEvil,
                     Hyperparameter.MaximumStealBetweenGoodEvil);
 
-                double relationshipDecreaseAmount = (double)(toSteal - Hyperparameter.MinimumStealBetweenEvil) /
+                double relationshipDecreaseAmount = (double) (toSteal - Hyperparameter.MinimumStealBetweenEvil) /
                                                     (Hyperparameter.MaximumStealBetweenEvil -
                                                      Hyperparameter.MinimumStealBetweenEvil);
                 if (relationshipDecreaseAmount < Hyperparameter.MinimumRelationshipDecreaseGoodEvil)
@@ -164,7 +166,8 @@ namespace SocialSim.Model
 
                 Relationship relationship = firstPerson.GetRelationshipTo(secondPerson.Id);
                 relationship.Relation -= relationshipDecreaseAmount;
-                firstPerson.SetRelationship(relationship, secondPerson.Id);
+                relationship.UpdateAmount = relationshipDecreaseAmount;
+                firstPerson.SetRelationship(relationship);
             }
 
             if (firstStance == Stance.Evil && secondStance == Stance.Good)
@@ -172,7 +175,7 @@ namespace SocialSim.Model
                 int toSteal = random.Next(Hyperparameter.MinimumStealBetweenGoodEvil,
                     Hyperparameter.MaximumStealBetweenGoodEvil);
 
-                double relationshipDecreaseAmount = (double)(toSteal - Hyperparameter.MinimumStealBetweenEvil) /
+                double relationshipDecreaseAmount = (double) (toSteal - Hyperparameter.MinimumStealBetweenEvil) /
                                                     (Hyperparameter.MaximumStealBetweenEvil -
                                                      Hyperparameter.MinimumStealBetweenEvil);
                 if (relationshipDecreaseAmount < Hyperparameter.MinimumRelationshipDecreaseGoodEvil)
@@ -193,18 +196,34 @@ namespace SocialSim.Model
 
                 Relationship relationship = secondPerson.GetRelationshipTo(firstPerson.Id);
                 relationship.Relation -= relationshipDecreaseAmount;
-                secondPerson.SetRelationship(relationship, firstPerson.Id);
+                relationship.UpdateAmount = relationshipDecreaseAmount;
+                secondPerson.SetRelationship(relationship);
             }
 
             if (firstStance == Stance.Good && secondStance == Stance.Good)
             {
                 Relationship firstToSecondRelationship = firstPerson.GetRelationshipTo(secondPerson.Id);
                 Relationship secondToFirstRelationship = secondPerson.GetRelationshipTo(firstPerson.Id);
-                firstToSecondRelationship.Relation *= 1.1;
-                secondToFirstRelationship.Relation *= 1.1;
 
-                firstPerson.SetRelationship(firstToSecondRelationship, secondPerson.Id);
-                secondPerson.SetRelationship(secondToFirstRelationship, firstPerson.Id);
+                double firstRelation = firstToSecondRelationship.Relation;
+                double secondRelation = secondToFirstRelationship.Relation;
+
+                firstToSecondRelationship.Relation += (firstToSecondRelationship.Relation + 1) *
+                                                      Hyperparameter.RelationshipIncreaseBetweenGood;
+                secondToFirstRelationship.Relation += (secondToFirstRelationship.Relation + 1) *
+                                                      Hyperparameter.RelationshipIncreaseBetweenGood;
+
+                firstToSecondRelationship.Relation =
+                    (firstToSecondRelationship.Relation > 1) ? 1 : firstToSecondRelationship.Relation;
+
+                secondToFirstRelationship.Relation =
+                    (secondToFirstRelationship.Relation > 1) ? 1 : secondToFirstRelationship.Relation;
+
+                firstToSecondRelationship.UpdateAmount = firstToSecondRelationship.Relation - firstRelation;
+                secondToFirstRelationship.UpdateAmount = secondToFirstRelationship.Relation - secondRelation;
+
+                firstPerson.SetRelationship(firstToSecondRelationship);
+                secondPerson.SetRelationship(secondToFirstRelationship);
             }
         }
 

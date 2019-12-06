@@ -26,7 +26,7 @@ namespace SocialSim.Elements
         /// <param name="power"> Amount of social power this person has </param>
         public Person(int id, float selflessness, float selfishness, int money, uint power)
         {
-            Id= id;
+            Id = id;
             Selflessness = selflessness;
             Selfishness = selfishness;
             Money = money;
@@ -43,15 +43,32 @@ namespace SocialSim.Elements
             RelationshipList.Add(relationship);
         }
 
-        public void SetRelationship(Relationship relationship, int targetPersonId)
+        /// <summary>
+        /// Sets relationship between people
+        /// </summary>
+        /// <param name="relationship"> relationship from this person to other </param>
+        public void SetRelationship(Relationship relationship)
+        {
+            if (relationship.From != Id)
+                throw new ArgumentException("Relationship does not match with this person");
+
+            int size = RelationshipList.Count;
+            for (int index = 0; index < size; ++index)
+            {
+                if (RelationshipList[index].To == relationship.To)
+                {
+                    RelationshipList[index] = relationship;
+                }
+            }
+        }
+
+        public void ClearRelationships()
         {
             int size = RelationshipList.Count;
             for (int index = 0; index < size; ++index)
             {
-                if (RelationshipList[index].To == targetPersonId)
-                {
-                    RelationshipList[index] = relationship;
-                }
+                RelationshipList[index].HasComputed = false;
+                RelationshipList[index].UpdateAmount = 0;
             }
         }
 
@@ -78,6 +95,7 @@ namespace SocialSim.Elements
                     return relationship;
                 }
             }
+
             return new Relationship(Id, targetPersonId, 0, 0);
         }
 
@@ -92,6 +110,5 @@ namespace SocialSim.Elements
         public float Selfishness { get; }
 
         public List<Relationship> RelationshipList { get; }
-
     }
 }

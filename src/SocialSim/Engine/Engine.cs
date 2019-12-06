@@ -33,35 +33,17 @@ namespace SocialSim.Engine
             RelationShipDescriptorList = relationShipDescriptorList;
             PeopleList = peopleList;
             _temporaryDescriptorList = new List<RelationshipDescriptor>(relationShipDescriptorList.Count);
+            _random = new Random();
         }
 
-        private void SelectRelationshipSet()
+
+        public void ClearRelationships()
         {
-            Random rand = new Random();
-            foreach (var relationShipDescriptor in RelationShipDescriptorList)
-            {
-                var relationShipTuple = relationShipDescriptor.GetRelationshipTuple();
-                var minFrequency = Math.Min(relationShipTuple.Item1.Frequency, relationShipTuple.Item2.Frequency);
-                var randValue = rand.NextDouble();
-
-                Tuple<int, int> peopleIdTuple = relationShipDescriptor.GetPeopleIdTuple();
-
-                Person subjectPerson = PeopleList.Find(person => person.Id == peopleIdTuple.Item1);
-                Person targetPerson = PeopleList.Find(person => person.Id == peopleIdTuple.Item2);
-
-                if (randValue < minFrequency)
-                {
-                    _temporaryDescriptorList.Add(relationShipDescriptor);
-                    _temporaryPeopleList.Add(subjectPerson);
-                    _temporaryPeopleList.Add(targetPerson);
-                }
+            int size = PeopleList.Count;
+            for (int index = 0; index < size; ++index)
+            { 
+                PeopleList[index].ClearRelationships();
             }
-        }
-
-        private void ClearTemporaries()
-        {
-            _temporaryDescriptorList.Clear();
-            _temporaryPeopleList.Clear();
         }
 
         /// <summary>
@@ -77,6 +59,10 @@ namespace SocialSim.Engine
             for(int index = 0; index < size; ++index)
             {
                 Relationship subjectRelationship = subjectPerson.RelationshipList[index];
+                double meetProb = subjectRelationship.Frequency;
+
+                if (_random.NextDouble() > meetProb)
+                    continue;
 
                 int targetPersonId = subjectRelationship.To;
                 Person targetPerson = PeopleList[targetPersonId];
@@ -92,8 +78,11 @@ namespace SocialSim.Engine
                 _model.ComputeAction(ref subjectPerson, ref targetPerson, ref subjectRelationship, ref targetRelationship,
                     subjectStance, targetStance);
 
+                subjectRelationship.HasComputed = true;
+                targetRelationship.HasComputed = true;
+
                 subjectPerson.RelationshipList[index] = subjectRelationship;
-                targetPerson.SetRelationship(targetRelationship,targetPersonId);
+                targetPerson.SetRelationship(targetRelationship);
 
                 PeopleList[subjectPersonId] = subjectPerson;
                 PeopleList[targetPersonId] = targetPerson;
@@ -105,8 +94,7 @@ namespace SocialSim.Engine
             Person person = PeopleList[personIndex];
             int descriptorIndex = personIndex / 2;
 
-            //Relationship relationship = RelationShipDescriptorList[descriptorIndex].GetRelationship(person.Id);
-
+            // Relationship relationship = RelationShipDescriptorList[descriptorIndex].GetRelationship(person.Id);
         }
 
         public List<RelationshipDescriptor> RelationShipDescriptorList { get; set; }
@@ -118,5 +106,7 @@ namespace SocialSim.Engine
         private List<RelationshipDescriptor> _temporaryDescriptorList;
 
         private List<Person> _temporaryPeopleList;
+
+        private Random _random;
     }
 }
