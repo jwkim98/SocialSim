@@ -140,3 +140,5 @@ $RECYCLE.BIN/
 _NCrunch*
 
 src/SocialSim/.vs/SocialSim/DesignTimeBuild/
+
+*.csv

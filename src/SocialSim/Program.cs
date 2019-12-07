@@ -8,15 +8,15 @@ namespace SocialSim
         {
             Console.WriteLine("Hello World!");
 
-            string peopleFilePath = "";
-            string relationshipFilePath = "";
+            string peopleFilePath = "input\\People.csv";
+            string relationshipFilePath = "input\\Relationship.csv";
 
             Engine.Engine engine = new Engine.Engine(new Model.Model());
             
             engine.ReadPeopleFile(peopleFilePath);
             engine.ReadRelationshipFile(relationshipFilePath);
             
-            engine.Run(100, 10, "Output");
+            engine.Run(10, 5, "output");
         }
     }
 }
