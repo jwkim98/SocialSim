@@ -15,7 +15,7 @@ namespace SocialSim.Elements
         /// <param name="to"> Id of the person that this relationship is targeting </param>
         /// <param name="relation"> Indicates how close are people specified in the relationship object </param>
         /// <param name="frequency"> Indicates how often specified people in this Relationship object meet  </param>
-        public Relationship(int from, int to, double relation, uint frequency)
+        public Relationship(int @from, int to, double relation, double frequency)
         {
             From = from;
             To = to;
@@ -30,7 +30,7 @@ namespace SocialSim.Elements
         public bool HasComputed { get; set; }
 
         public double Relation;
-        public float Frequency;
+        public double Frequency;
     }
 
     /// <summary>

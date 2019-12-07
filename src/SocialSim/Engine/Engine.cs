@@ -12,29 +12,6 @@ namespace SocialSim.Engine
     /// </summary>
     class Engine
     {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="model"> _model for computing Engine </param>
-        /// <param name="relationShipDescriptorList"> List of relationships between people </param>
-        /// <param name="peopleList"> List of people to simulate </param>
-        public Engine(Model.Model model, List<RelationshipDescriptor> relationShipDescriptorList,
-            List<Person> peopleList)
-        {
-            // Check if number of people matches
-            if (relationShipDescriptorList.Count != peopleList.Count)
-            {
-                throw new ArgumentException("Size of relationship and peopleList does not match");
-            }
-
-            _model = model;
-            RelationShipDescriptorList = relationShipDescriptorList;
-            PeopleList = peopleList;
-            _temporaryDescriptorList = new List<RelationshipDescriptor>(relationShipDescriptorList.Count);
-            _random = new Random();
-        }
-
-
         public void ClearRelationships()
         {
             int size = PeopleList.Count;
@@ -44,7 +21,7 @@ namespace SocialSim.Engine
             }
         }
 
-        public void ReadFile(String path)
+        public void ReadPeopleFile(String path)
         {
             using (StreamReader fs = new StreamReader(path))
             {
@@ -60,6 +37,45 @@ namespace SocialSim.Engine
                 selfishness = float.Parse(values[2]);
 
                 PeopleList.Add(new Person(id, selflessness, selfishness, money, power));
+            }
+        }
+
+        public void ReadRelationshipFile(string path)
+        {
+            using (StreamReader fs = new StreamReader(path))
+            {
+                var str = fs.ReadLine();
+                var values = str.Split(",");
+                int from, to;
+                double relation, frequency;
+                int.TryParse(values[0], out from);
+                int.TryParse(values[1], out to);
+
+                relation = double.Parse(values[1]);
+                frequency = double.Parse(values[2]);
+
+                PeopleList[from].AddRelationship(new Relationship(from, to, relation, frequency));
+            }
+        }
+
+        public void Run(int epochs)
+        {
+            int size = PeopleList.Count;
+
+            for (int epoch = 0; epoch < epochs; ++epoch)
+            {
+                for (int i = 0; i < size; ++i)
+                {
+                    Meet(i);
+                }
+
+                for (int i = 0; i < size; ++i)
+                {
+                    for (int j = 0; j < size; ++j)
+                    {
+                        Rumor(i, j);
+                    }
+                }
             }
         }
 
@@ -132,15 +148,9 @@ namespace SocialSim.Engine
             relationshipToTarget.Relation -= rumor;
         }
 
-        public List<RelationshipDescriptor> RelationShipDescriptorList { get; set; }
-
         public List<Person> PeopleList { get; set; }
 
         private readonly Model.Model _model;
-
-        private List<RelationshipDescriptor> _temporaryDescriptorList;
-
-        private List<Person> _temporaryPeopleList;
 
         private Random _random;
     }
