@@ -26,6 +26,8 @@ namespace SocialSim.Model
 
         public static readonly double RelationshipIncreaseBetweenGood = 1.1;
 
+        public static readonly double StanceThresholdBetweenGoodEvil = 0.5;
+
         public static readonly double relationshipRatioToFrequency = 0.3;
     }
 }

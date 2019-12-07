@@ -19,6 +19,7 @@ namespace SocialSim.Elements
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name ="groupId"> Id of the group </param>
         /// <param name="id"> Id unique to this person </param>
         /// <param name="selflessness"> Degree pf selflessness of this person </param>
         /// <param name="selfishness"> Degree of selfishness of this person </param>

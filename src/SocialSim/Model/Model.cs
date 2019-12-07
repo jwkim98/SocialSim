@@ -10,7 +10,6 @@ namespace SocialSim.Model
     {
         Good,
         Evil,
-        Middle,
     }
 
     /// <summary>
@@ -19,12 +18,8 @@ namespace SocialSim.Model
     /// </summary>
     class Model
     {
-        public Model(double evilThreshold, double goodThreshold)
+        public Model()
         {
-            if (evilThreshold > goodThreshold)
-                throw new ArgumentException("GoodThreshold should be always equal or greater than EvilThreshold");
-            EvilThreshold = evilThreshold;
-            GoodThreshold = goodThreshold;
         }
 
         /// <summary>
@@ -46,10 +41,8 @@ namespace SocialSim.Model
         /// <returns> Stance that person should have to the other </returns>
         public virtual Stance GetStance(double actionDegree)
         {
-            if (actionDegree < EvilThreshold)
+            if (actionDegree < Hyperparameter.StanceThresholdBetweenGoodEvil)
                 return Stance.Evil;
-            if (actionDegree < GoodThreshold)
-                return Stance.Middle;
             return Stance.Good;
         }
 
@@ -228,9 +221,5 @@ namespace SocialSim.Model
         }
 
         protected static readonly Random Random = new Random();
-
-        public double EvilThreshold { get; }
-
-        public double GoodThreshold { get; }
     }
 }

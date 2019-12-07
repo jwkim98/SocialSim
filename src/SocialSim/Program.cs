@@ -11,7 +11,7 @@ namespace SocialSim
             string peopleFilePath = "";
             string relationshipFilePath = "";
 
-            Engine.Engine engine = new Engine.Engine(new Model.Model(0.3, 0.7));
+            Engine.Engine engine = new Engine.Engine(new Model.Model());
             
             engine.ReadPeopleFile(peopleFilePath);
             engine.ReadRelationshipFile(relationshipFilePath);

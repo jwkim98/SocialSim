@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Windows.Markup;
 using SocialSim.Elements;
 using SocialSim.Model;
 
@@ -24,6 +23,9 @@ namespace SocialSim.Engine
             _simulationModel = simulationModel;
         }
 
+        /// <summary>
+        /// Clears all relationships for all people
+        /// </summary>
         public void ClearRelationships()
         {
             int size = PeopleList.Count;
@@ -33,9 +35,14 @@ namespace SocialSim.Engine
             }
         }
 
-        public void ReadPeopleFile(String path)
+        /// <summary>
+        /// Reads csv file that includes information about people
+        /// The format is specified in Readme.md
+        /// </summary>
+        /// <param name="filename">Name of the csv file </param>
+        public void ReadPeopleFile(String filename)
         {
-            using StreamReader fs = new StreamReader(path);
+            using StreamReader fs = new StreamReader(filename);
             var str = fs.ReadLine();
             var values = str.Split(",");
 
@@ -50,9 +57,14 @@ namespace SocialSim.Engine
             PeopleList.Add(new Person(groupId, id, selflessness, selfishness, money, power));
         }
 
-        public void ReadRelationshipFile(string path)
+        /// <summary>
+        /// Reads csv file that includes information about relationship
+        /// The format is specified in Readme.md
+        /// </summary>
+        /// <param name="filename">Name of the csv file </param>
+        public void ReadRelationshipFile(string filename)
         {
-            using StreamReader fs = new StreamReader(path);
+            using StreamReader fs = new StreamReader(filename);
             var str = fs.ReadLine();
             var values = str.Split(",");
 
@@ -65,6 +77,11 @@ namespace SocialSim.Engine
             PeopleList[from].AddRelationship(new Relationship(from, to, relation, frequency));
         }
 
+        /// <summary>
+        /// Writes csv file that includes information about relationship
+        /// The format is specified in Readme.md
+        /// </summary>
+        /// <param name="filename"> Name of the people csv file </param>
         public void WritePeopleFile(String filename)
         {
             var csv = new StringBuilder();
@@ -79,6 +96,11 @@ namespace SocialSim.Engine
             File.WriteAllText(filename, csv.ToString());
         }
 
+        /// <summary>
+        /// Writes csv file that includes information about relationship
+        /// The format is specified in Readme.md
+        /// </summary>
+        /// <param name="filename"> Name of the relationship csv file</param>
         public void WriteRelationshipFile(String filename)
         {
             var csv = new StringBuilder();
@@ -95,6 +117,12 @@ namespace SocialSim.Engine
             File.WriteAllText(filename, csv.ToString());
         }
 
+        /// <summary>
+        /// Runs simulation for given epochs
+        /// </summary>
+        /// <param name="epochs"> Number of epochs to run </param>
+        /// <param name="writeDuration"> Duration between epochs between file write </param>
+        /// <param name="outputDir"> Output directory of the record file </param>
         public void Run(int epochs, int writeDuration, string outputDir)
         {
             int size = PeopleList.Count;
