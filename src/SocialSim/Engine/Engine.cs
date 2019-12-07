@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using System.Windows.Markup;
 using SocialSim.Elements;
 using SocialSim.Model;
 
@@ -8,10 +10,20 @@ using SocialSim.Model;
 namespace SocialSim.Engine
 {
     /// <summary>
-    /// This class computes given relationships and people with _model given as a parameter
+    /// This class computes given relationships and people with _simulationModel given as a parameter
     /// </summary>
     class Engine
     {
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="simulationModel"> Model to use for simulation </param>
+        public Engine(Model.Model simulationModel)
+        {
+            _simulationModel = simulationModel;
+        }
+
         public void ClearRelationships()
         {
             int size = PeopleList.Count;
@@ -23,42 +35,67 @@ namespace SocialSim.Engine
 
         public void ReadPeopleFile(String path)
         {
-            using (StreamReader fs = new StreamReader(path))
-            {
-                var str = fs.ReadLine();
-                var values = str.Split(",");
-                int id, money, power;
-                float selflessness, selfishness;
-                int.TryParse(values[0], out id);
-                int.TryParse(values[3], out money);
-                int.TryParse(values[4], out power);
+            using StreamReader fs = new StreamReader(path);
+            var str = fs.ReadLine();
+            var values = str.Split(",");
 
-                selflessness = float.Parse(values[1]);
-                selfishness = float.Parse(values[2]);
+            int.TryParse(values[0], out int groupId);
+            int.TryParse(values[1], out int id);
+            int.TryParse(values[4], out int money);
+            int.TryParse(values[5], out int power);
 
-                PeopleList.Add(new Person(id, selflessness, selfishness, money, power));
-            }
+            float selflessness = float.Parse(values[2]);
+            float selfishness = float.Parse(values[3]);
+
+            PeopleList.Add(new Person(groupId, id, selflessness, selfishness, money, power));
         }
 
         public void ReadRelationshipFile(string path)
         {
-            using (StreamReader fs = new StreamReader(path))
-            {
-                var str = fs.ReadLine();
-                var values = str.Split(",");
-                int from, to;
-                double relation, frequency;
-                int.TryParse(values[0], out from);
-                int.TryParse(values[1], out to);
+            using StreamReader fs = new StreamReader(path);
+            var str = fs.ReadLine();
+            var values = str.Split(",");
 
-                relation = double.Parse(values[1]);
-                frequency = double.Parse(values[2]);
+            int.TryParse(values[0], out int from);
+            int.TryParse(values[1], out int to);
 
-                PeopleList[from].AddRelationship(new Relationship(from, to, relation, frequency));
-            }
+            double relation = double.Parse(values[1]);
+            double frequency = double.Parse(values[2]);
+
+            PeopleList[from].AddRelationship(new Relationship(from, to, relation, frequency));
         }
 
-        public void Run(int epochs)
+        public void WritePeopleFile(String filename)
+        {
+            var csv = new StringBuilder();
+            
+            foreach(Person person in PeopleList)
+            {
+                var newline = String.Format("{0},{1},{2},{3},{4}", person.Id.ToString(),
+                    person.Selflessness.ToString(), person.Selflessness.ToString(), person.Money.ToString(),
+                    person.Power.ToString());
+                csv.Append(newline);
+            }
+            File.WriteAllText(filename, csv.ToString());
+        }
+
+        public void WriteRelationshipFile(String filename)
+        {
+            var csv = new StringBuilder();
+
+            foreach (Person person in PeopleList)
+            {
+                foreach (Relationship relationship in person.RelationshipList)
+                {
+                    var newline = String.Format("{0},{1},{2},{3}", relationship.From.ToString(),
+                        relationship.To.ToString(), relationship.Relation.ToString(), relationship.Frequency.ToString());
+                    csv.Append(newline);
+                }
+            }
+            File.WriteAllText(filename, csv.ToString());
+        }
+
+        public void Run(int epochs, int writeDuration, string outputDir)
         {
             int size = PeopleList.Count;
 
@@ -75,6 +112,15 @@ namespace SocialSim.Engine
                     {
                         Rumor(i, j);
                     }
+                }
+
+                if (epochs % writeDuration == 0)
+                {
+                    var peopleFilePath = "People_" + (epochs / writeDuration).ToString();
+                    var relationshipFilePath = "Relationship_" + (epochs / writeDuration).ToString();
+                    
+                    WritePeopleFile(Path.Combine(outputDir, peopleFilePath));
+                    WriteRelationshipFile(Path.Combine(outputDir, relationshipFilePath));
                 }
             }
         }
@@ -102,13 +148,13 @@ namespace SocialSim.Engine
 
                 Relationship targetRelationship = targetPerson.GetRelationshipTo(subjectPersonId);
 
-                double subjectActionDegree = _model.ComputeActionDegree(subjectPerson, subjectRelationship);
-                double targetActionDegree = _model.ComputeActionDegree(targetPerson, targetRelationship);
+                double subjectActionDegree = _simulationModel.ComputeActionDegree(subjectPerson, subjectRelationship);
+                double targetActionDegree = _simulationModel.ComputeActionDegree(targetPerson, targetRelationship);
 
-                Stance subjectStance = _model.GetStance(subjectActionDegree);
-                Stance targetStance = _model.GetStance(targetActionDegree);
+                Stance subjectStance = _simulationModel.GetStance(subjectActionDegree);
+                Stance targetStance = _simulationModel.GetStance(targetActionDegree);
 
-                _model.ComputeAction(ref subjectPerson, ref targetPerson, ref subjectRelationship,
+                _simulationModel.ComputeAction(ref subjectPerson, ref targetPerson, ref subjectRelationship,
                     ref targetRelationship,
                     subjectStance, targetStance);
 
@@ -143,15 +189,15 @@ namespace SocialSim.Engine
                 }
             }
 
-            double rumor = (relationshipToTarget.Relation + 1) * relationshipUpdateAmount;
+            double rumor = (relationshipToTarget.Frequency) * relationshipUpdateAmount;
             // TODO : How should we normalize this?
-            relationshipToTarget.Relation -= rumor;
+            relationshipToTarget.Relation -= (rumor*4)/PeopleList.Count;
         }
 
         public List<Person> PeopleList { get; set; }
 
-        private readonly Model.Model _model;
+        private readonly Model.Model _simulationModel;
 
-        private Random _random;
+        private readonly Random _random = new Random();
     }
 }

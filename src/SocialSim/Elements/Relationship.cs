@@ -1,4 +1,5 @@
 ﻿using System;
+using SocialSim.Model;
 
 namespace SocialSim.Elements
 {
@@ -30,7 +31,21 @@ namespace SocialSim.Elements
         public bool HasComputed { get; set; }
 
         public double Relation;
-        public double Frequency;
+
+        private double _frequency;
+        public double Frequency {
+            get
+            {
+                var rtnVal = _frequency + Hyperparameter.relationshipRatioToFrequency * Relation;
+                if (rtnVal < 0)
+                    rtnVal = 0;
+                if (rtnVal > 1)
+                    rtnVal = 1;
+                return rtnVal;
+            }
+
+            private set { _frequency = value; }
+        }
     }
 
     /// <summary>

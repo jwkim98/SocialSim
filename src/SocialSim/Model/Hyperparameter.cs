@@ -25,5 +25,7 @@ namespace SocialSim.Model
         public static readonly double MinimumRelationshipDecreaseGoodEvil = 0.3;
 
         public static readonly double RelationshipIncreaseBetweenGood = 1.1;
+
+        public static readonly double relationshipRatioToFrequency = 0.3;
     }
 }
