@@ -43,6 +43,7 @@ for k in range(looptime):
 
 
 
+
     #Personal Data 입력, 사람번호, 이타심, 이기심, money, strength 순
     for i in range(number[k]):
         if (k==0):
@@ -51,7 +52,7 @@ for k in range(looptime):
             personid=i
             for j in range(k):
                 personid=personid+number[j]
-        write.writerow(["%d" %personid,"%.3f" %selflessness[i],"%.3f" %selfishness[i],"%d" %money,"%.3f" %strength[i]])
+        write.writerow(["%d" %k, "%d" %personid,"%.3f" %selflessness[i],"%.3f" %selfishness[i],"%d" %money,"%.3f" %strength[i]])
 f.close()
 
 
