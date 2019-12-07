@@ -24,7 +24,7 @@ namespace SocialSim.Elements
         /// <param name="selfishness"> Degree of selfishness of this person </param>
         /// <param name="money"> Degree of health of this person Only </param>
         /// <param name="power"> Amount of social power this person has </param>
-        public Person(int id, float selflessness, float selfishness, int money, uint power)
+        public Person(int id, float selflessness, float selfishness, int money, int power)
         {
             Id = id;
             Selflessness = selflessness;
@@ -119,7 +119,7 @@ namespace SocialSim.Elements
 
         public int Money;
 
-        public uint Power;
+        public int Power;
 
         public float Selflessness { get; }
 

@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO.Enumeration;
-using System.Reflection.Metadata;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
+using System.IO;
 using SocialSim.Elements;
 using SocialSim.Model;
 
@@ -44,6 +41,25 @@ namespace SocialSim.Engine
             for (int index = 0; index < size; ++index)
             {
                 PeopleList[index].ClearRelationships();
+            }
+        }
+
+        public void ReadFile(String path)
+        {
+            using (StreamReader fs = new StreamReader(path))
+            {
+                var str = fs.ReadLine();
+                var values = str.Split(",");
+                int id, money, power;
+                float selflessness, selfishness;
+                int.TryParse(values[0], out id);
+                int.TryParse(values[3], out money);
+                int.TryParse(values[4], out power);
+
+                selflessness = float.Parse(values[1]);
+                selfishness = float.Parse(values[2]);
+
+                PeopleList.Add(new Person(id, selflessness, selfishness, money, power));
             }
         }
 
