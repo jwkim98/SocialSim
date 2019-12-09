@@ -15,7 +15,7 @@ namespace SocialSim
             engine.ReadPeopleFile(peopleFilePath);
             engine.ReadRelationshipFile(relationshipFilePath);
             
-            engine.Run(10, 5, "output");
+            engine.Run(10, 1, "output3");
         }
     }
 }

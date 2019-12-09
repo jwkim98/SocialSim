@@ -36,7 +36,7 @@ namespace SocialSim.Elements
         public double Frequency {
             get
             {
-                var rtnVal = _frequency + Hyperparameter.relationshipRatioToFrequency * Relation;
+                var rtnVal = _frequency + Hyperparameter.RelationshipRatioToFrequency * Relation;
                 if (rtnVal < 0)
                     rtnVal = 0;
                 if (rtnVal > 1)

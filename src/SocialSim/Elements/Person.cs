@@ -117,6 +117,30 @@ namespace SocialSim.Elements
             return new Relationship(Id, targetPersonId, 0, 0);
         }
 
+        public Tuple<double, double> GetRelationshipMinMax()
+        {
+            double relationshipMin = double.MaxValue;
+            double relationshipMax = double.MinValue;
+            foreach (Relationship relation in RelationshipList)
+            {
+                if (relation.Relation < relationshipMin)
+                    relationshipMin = relation.Relation;
+                if (relation.Relation > relationshipMax)
+                    relationshipMax = relation.Relation;
+            }
+
+            return new Tuple<double, double>(relationshipMin, relationshipMax);
+        }
+
+        public void NormalizeRelationship(double relationshipMin, double relationshipMax)
+        {
+            foreach (Relationship relationship in RelationshipList)
+            {
+                relationship.Relation =
+                    ((relationship.Relation - relationshipMin) / (relationshipMax - relationshipMin))*2 - 1;
+            }
+        }
+
         public int GroupId { get; }
 
         public int Id { get; }

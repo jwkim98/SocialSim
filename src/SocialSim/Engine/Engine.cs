@@ -102,8 +102,8 @@ namespace SocialSim.Engine
             foreach(Person person in PeopleList)
             {
                 var newline = String.Format("{0},{1},{2},{3},{4},{5},{6}", person.GroupId.ToString(), person.Id.ToString(), 
-                    person.Selflessness.ToString(ToString()), person.Selfishness.ToString(ToString()), person.Money.ToString(),
-                    person.Strength.ToString(ToString()), person.Strength.ToString(ToString()));
+                    person.Selflessness.ToString(), person.Selfishness.ToString(), person.Money.ToString(),
+                    person.Strength.ToString(), _getPower(person).ToString());
                 csv.Append(newline + "\n");
             }
             File.WriteAllText(filename, csv.ToString());
@@ -142,6 +142,7 @@ namespace SocialSim.Engine
 
             for (int epoch = 0; epoch < epochs; ++epoch)
             {
+                Console.WriteLine("Epoch :  " +  epoch);
                 for (int i = 0; i < size; ++i)
                 {
                     Meet(i);
@@ -155,11 +156,16 @@ namespace SocialSim.Engine
                     }
                 }
 
-                if (epochs % writeDuration == 0)
+                NormalizeRelation();
+
+                if (epoch % writeDuration == 0)
                 {
-                    var peopleFilePath = "People_" + (epochs / writeDuration).ToString() + ".csv";
-                    var relationshipFilePath = "Relationship_" + (epochs / writeDuration).ToString() + ".csv";
+                    var peopleFilePath = "People_" + (epoch / writeDuration).ToString() + ".csv";
+                    var relationshipFilePath = "Relationship_" + (epoch / writeDuration).ToString() + ".csv";
                     
+                    Console.WriteLine("PeoplePath: " + peopleFilePath);
+                    Console.WriteLine(" RelationshipPath : " + relationshipFilePath);
+
                     WritePeopleFile(Path.Combine(outputDir, peopleFilePath));
                     WriteRelationshipFile(Path.Combine(outputDir, relationshipFilePath));
                 }
@@ -245,13 +251,32 @@ namespace SocialSim.Engine
 
         private double _getPower(Person person)
         {
-            double power = 0;
+            double power = person.Strength;
             foreach (var relationship in person.RelationshipList)
             {
-                power += (relationship.Relation + 1) * PeopleList[relationship.To].Strength;
+                power += (relationship.Relation + 1) * PeopleList[relationship.To].Strength
+                *Hyperparameter.OtherPersonRatio;
+            }
+            return power;
+        }
+
+        public void NormalizeRelation()
+        {
+            double relationshipMin = double.MaxValue;
+            double relationshipMax = double.MinValue;
+            foreach (Person person in PeopleList)
+            {
+                var tuple = person.GetRelationshipMinMax();
+                if (relationshipMin > tuple.Item1)
+                    relationshipMin = tuple.Item1;
+                if (relationshipMax < tuple.Item2)
+                    relationshipMax = tuple.Item2;
             }
 
-            return power;
+            foreach (Person person in PeopleList)
+            {
+                person.NormalizeRelationship(relationshipMin, relationshipMax);
+            }
         }
 
         public List<Person> PeopleList { get; set; }
