@@ -24,15 +24,15 @@ namespace SocialSim.Elements
         /// <param name="selflessness"> Degree pf selflessness of this person </param>
         /// <param name="selfishness"> Degree of selfishness of this person </param>
         /// <param name="money"> Degree of health of this person Only </param>
-        /// <param name="power"> Amount of social power this person has </param>
-        public Person(int groupId, int id, float selflessness, float selfishness, int money, int power)
+        /// <param name="strength"> Amount of social strength this person has </param>
+        public Person(int groupId, int id, float selflessness, float selfishness, int money, double strength)
         {
             GroupId = groupId;
             Id = id;
             Selflessness = selflessness;
             Selfishness = selfishness;
             Money = money;
-            Power = power;
+            Strength = strength;
             RelationshipList = new List<Relationship>(Hyperparameter.MaxRelationshipCount);
         }
 
@@ -123,7 +123,7 @@ namespace SocialSim.Elements
 
         public int Money;
 
-        public int Power;
+        public double Strength;
 
         public float Selflessness { get; }
 

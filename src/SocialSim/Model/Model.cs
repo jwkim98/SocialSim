@@ -74,13 +74,13 @@ namespace SocialSim.Model
         public virtual void ComputeAction(ref Person firstPerson, ref Person secondPerson,
             ref Relationship firstRelationship,
             ref Relationship secondRelationship, Stance firstStance,
-            Stance secondStance)
+            Stance secondStance, double firstPersonPower, double secondPersonPower)
         {
             Random random = new Random();
 
             if (firstStance == Stance.Evil && secondStance == Stance.Evil)
             {
-                double victoryProbFirst = (double) firstPerson.Power / (firstPerson.Power + secondPerson.Power);
+                double victoryProbFirst = firstPersonPower / (firstPersonPower+ secondPersonPower);
                 double randomThreshold = random.NextDouble();
 
                 int toSteal = random.Next(Hyperparameter.MinimumStealBetweenEvil,

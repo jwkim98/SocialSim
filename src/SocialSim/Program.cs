@@ -6,7 +6,6 @@ namespace SocialSim
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
 
             string peopleFilePath = "input\\People.csv";
             string relationshipFilePath = "input\\Relationship.csv";

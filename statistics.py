@@ -9,13 +9,13 @@ def read_file(n):
     return data_person, data_relation
 
 def read_entire_data(N):
-    d1, d2 = read_file("input")
+    d1, d2 = read_file("2")
     people = [d1]
     relationship = [d2]
-    for i in range(1, N+1):
-        d1, d2 = read_file(i)
-        people.append(d1)
-        relationship.append(d2)
+#    for i in range(1, N+1):
+#        d1, d2 = read_file(i)
+#        people.append(d1)
+#        relationship.append(d2)
     return people, relationship
 
 def grouping(data):

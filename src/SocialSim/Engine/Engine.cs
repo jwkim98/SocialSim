@@ -21,6 +21,7 @@ namespace SocialSim.Engine
         public Engine(Model.Model simulationModel)
         {
             _simulationModel = simulationModel;
+            PeopleList = new List<Person>(1000);
         }
 
         /// <summary>
@@ -43,18 +44,25 @@ namespace SocialSim.Engine
         public void ReadPeopleFile(String filename)
         {
             using StreamReader fs = new StreamReader(filename);
-            var str = fs.ReadLine();
-            var values = str.Split(",");
+            while (!fs.EndOfStream)
+            {
+                var str = fs.ReadLine();
+                if (String.IsNullOrEmpty(str) || str[0] == ',')
+                    continue;
+                var values = str.Split(",");
 
-            int.TryParse(values[0], out int groupId);
-            int.TryParse(values[1], out int id);
-            int.TryParse(values[4], out int money);
-            int.TryParse(values[5], out int power);
+                int.TryParse(values[0], out int groupId);
+                int.TryParse(values[1], out int id);
+                int.TryParse(values[4], out int money);
 
-            float selflessness = float.Parse(values[2]);
-            float selfishness = float.Parse(values[3]);
+                float selflessness = float.Parse(values[2]);
+                float selfishness = float.Parse(values[3]);
+                double power = double.Parse(values[5]);
 
-            PeopleList.Add(new Person(groupId, id, selflessness, selfishness, money, power));
+                Person person = new Person(groupId, id, selflessness, selfishness, money, power);
+
+                PeopleList.Add(person);
+            }
         }
 
         /// <summary>
@@ -65,16 +73,21 @@ namespace SocialSim.Engine
         public void ReadRelationshipFile(string filename)
         {
             using StreamReader fs = new StreamReader(filename);
-            var str = fs.ReadLine();
-            var values = str.Split(",");
+            while (!fs.EndOfStream)
+            {
+                var str = fs.ReadLine();
+                if (String.IsNullOrEmpty(str)||str[0] == ',')
+                    continue;
+                var values = str.Split(",");
 
-            int.TryParse(values[0], out int from);
-            int.TryParse(values[1], out int to);
+                int.TryParse(values[0], out int from);
+                int.TryParse(values[1], out int to);
 
-            double relation = double.Parse(values[1]);
-            double frequency = double.Parse(values[2]);
+                double relation = double.Parse(values[1]);
+                double frequency = double.Parse(values[2]);
 
-            PeopleList[from].AddRelationship(new Relationship(from, to, relation, frequency));
+                PeopleList[from].AddRelationship(new Relationship(from, to, relation, frequency));
+            }
         }
 
         /// <summary>
@@ -88,10 +101,10 @@ namespace SocialSim.Engine
             
             foreach(Person person in PeopleList)
             {
-                var newline = String.Format("{0},{1},{2},{3},{4}", person.Id.ToString(),
-                    person.Selflessness.ToString(), person.Selflessness.ToString(), person.Money.ToString(),
-                    person.Power.ToString());
-                csv.Append(newline);
+                var newline = String.Format("{0},{1},{2},{3},{4},{5},{6}", person.GroupId.ToString(), person.Id.ToString(), 
+                    person.Selflessness.ToString(ToString()), person.Selfishness.ToString(ToString()), person.Money.ToString(),
+                    person.Strength.ToString(ToString()), person.Strength.ToString(ToString()));
+                csv.Append(newline + "\n");
             }
             File.WriteAllText(filename, csv.ToString());
         }
@@ -111,7 +124,7 @@ namespace SocialSim.Engine
                 {
                     var newline = String.Format("{0},{1},{2},{3}", relationship.From.ToString(),
                         relationship.To.ToString(), relationship.Relation.ToString(), relationship.Frequency.ToString());
-                    csv.Append(newline);
+                    csv.Append(newline + "\n");
                 }
             }
             File.WriteAllText(filename, csv.ToString());
@@ -144,8 +157,8 @@ namespace SocialSim.Engine
 
                 if (epochs % writeDuration == 0)
                 {
-                    var peopleFilePath = "People_" + (epochs / writeDuration).ToString();
-                    var relationshipFilePath = "Relationship_" + (epochs / writeDuration).ToString();
+                    var peopleFilePath = "People_" + (epochs / writeDuration).ToString() + ".csv";
+                    var relationshipFilePath = "Relationship_" + (epochs / writeDuration).ToString() + ".csv";
                     
                     WritePeopleFile(Path.Combine(outputDir, peopleFilePath));
                     WriteRelationshipFile(Path.Combine(outputDir, relationshipFilePath));
@@ -182,9 +195,12 @@ namespace SocialSim.Engine
                 Stance subjectStance = _simulationModel.GetStance(subjectActionDegree);
                 Stance targetStance = _simulationModel.GetStance(targetActionDegree);
 
+                double firstPersonPower = _getPower(subjectPerson);
+                double secondPersonPower = _getPower(targetPerson);
+
                 _simulationModel.ComputeAction(ref subjectPerson, ref targetPerson, ref subjectRelationship,
                     ref targetRelationship,
-                    subjectStance, targetStance);
+                    subjectStance, targetStance, firstPersonPower, secondPersonPower);
 
                 subjectRelationship.HasComputed = true;
                 targetRelationship.HasComputed = true;
@@ -197,6 +213,11 @@ namespace SocialSim.Engine
             }
         }
 
+        /// <summary>
+        /// Calculates how rumor spreads between people
+        /// </summary>
+        /// <param name="subjectPersonId"></param>
+        /// <param name="targetPersonId"></param>
         public void Rumor(int subjectPersonId, int targetPersonId)
         {
             Person subjectPerson = PeopleList[subjectPersonId];
@@ -220,6 +241,17 @@ namespace SocialSim.Engine
             double rumor = (relationshipToTarget.Frequency) * relationshipUpdateAmount;
             // TODO : How should we normalize this?
             relationshipToTarget.Relation -= (rumor*4)/PeopleList.Count;
+        }
+
+        private double _getPower(Person person)
+        {
+            double power = 0;
+            foreach (var relationship in person.RelationshipList)
+            {
+                power += (relationship.Relation + 1) * PeopleList[relationship.To].Strength;
+            }
+
+            return power;
         }
 
         public List<Person> PeopleList { get; set; }
