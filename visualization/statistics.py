@@ -4,6 +4,13 @@ import numpy as np
 import pandas as pd
 import copy
 
+##@package visualization
+#Convert Output csv file from the main model to pandas DataFrame
+#Draw graph of values through time and scatter graph of several pairs of variables
+#
+
+
+
 def read_file(n,location):
     data_person = pd.read_csv("{}People_{}.csv".format(location,n),names=["GroupID", "PersonID","Selflessness","Selfishness","Money","Strength","Power"])
     data_relation = pd.read_csv("{}Relationship_{}.csv".format(location,n), names = ["Subjet", "Target", "relation", "probability"])
@@ -132,20 +139,34 @@ def main(N, location):
     plt.scatter(people[-1]["Selfishness"]-people[-1]["Selflessness"],people[-1]["Money"])
     plt.xlabel("Selfishness-Selflessness")
     plt.ylabel("Money")
-    plt.show()
-    plt.figure(4)
-    for i in range(N):
-        #plt.figure(i+4)
+    for i in range(0,N,5):
+        plt.figure(i/5+4)
         pow_rel = power_relation(people[i],relationship[i])
         plt.scatter(pow_rel["Power"],pow_rel["average"])
+        plt.title("Power-Relation epoch {}".format(i+1))
         plt.xlabel("Power")
         plt.ylabel("Average of relation")
-    plt.figure(5)
-    for i in range(N):
+    for i in range(0,N,5):
+        plt.figure(i+N/5+4)
         plt.scatter(people[i]["Strength"],people[i]["Power"])
+        plt.title("Strength-Power epoch {}".format(i+1))
+        plt.xlabel("Strength")
+        plt.ylabel("Power")
+    plt.show()
+    
+    
     
     
 if __name__=="__main__":
     N = input("Number of meeting cycle : ")
     location = input("Location of data : ")
     main(N, location)
+    
+    
+    
+    
+    
+    
+#time-based Selfishness-Selflessness and Money
+#Money-Power
+#Relation fish-fless
