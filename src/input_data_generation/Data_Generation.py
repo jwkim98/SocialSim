@@ -1,4 +1,5 @@
-
+# 일반적으로 Data Generation file은 Group 별로 data를 생성 가능
+# Group의 개념을 만들지 않으려면 모든 Group의 조건을 같이 하면 단 한개의 Group만 생성된 효과를 가져올 수 있음
 import csv
 import numpy as np
 looptime=3              #Group 개수
@@ -51,7 +52,7 @@ for k in range(looptime):
             personid=i
             for j in range(k):
                 personid=personid+number[j]
-        write.writerow(["%d" %0, "%d" %personid,"%.3f" %selflessness[i],"%.3f" %selfishness[i],"%d" %money,"%.3f" %strength[i]])
+        write.writerow(["%d" %0, "%d" %personid,"%.3f" %selflessness[i],"%.3f" %selfishness[i],"%d" %money,"%.3f" %strength[i]])  #만약 Group이 한개라면 모든 person의 Group ID는 0
 f.close()
 
 
@@ -92,7 +93,7 @@ for i in range(totalnumber):
             indexforplus=d
         else:
             indexforplus=numberforindex[groupnumber-1]+d
-        PersonalRelationship[indexforplus]=PersonalRelationship[indexforplus]         #Better relationship
+        PersonalRelationship[indexforplus]=PersonalRelationship[indexforplus]         #Better relationship(만약 Group이 한개이면 plus 값 안넣음)
     maxRelation=abs(PersonalRelationship[0])
     for j in range(totalnumber-1):
         if(abs(PersonalRelationship[j])>maxRelation):
@@ -105,7 +106,7 @@ for i in range(totalnumber):
         if (k!=i):
             if(groupnumber==0):
                 if (k<number2[0]):
-                    prob=0.05                      # 0.7
+                    prob=0.05                      # Group의 개념이 있다면 같은 그룹끼리 만나는 확률은 0.7, Group이 한개라면 0.05
                     write.writerow(["%d" %i, "%d" %k, PersonalRelationship[index],"%.5f" %prob])
                     index=index+1
                 else:
@@ -114,7 +115,7 @@ for i in range(totalnumber):
                     index=index+1
             else:
                 if (k>=number[groupnumber-1] and k<number[groupnumber]):
-                    prob=0.05                      # 0.7
+                    prob=0.05                      # Group의 개념이 있다면 같은 그룹끼리 만나는 확률은 0.7, Group이 한개라면 0.05
                     write.writerow(["%d" %i, "%d" %k, PersonalRelationship[index],"%.5f" %prob])
                     index=index+1
                 else:
