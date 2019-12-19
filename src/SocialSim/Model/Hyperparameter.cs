@@ -21,15 +21,16 @@ namespace SocialSim.Model
         public static readonly int MinimumStealBetweenGoodEvil = 150;
         public static readonly int MaximumStealBetweenGoodEvil = 250;
 
-        public static readonly double MinimumRelationshipDecreaseBetweenEvil = 0.01;
-        public static readonly double MinimumRelationshipDecreaseGoodEvil = 0.015;
+        public static readonly double MinimumRelationshipDecreaseBetweenEvil = 0.1;
+        public static readonly double MinimumRelationshipDecreaseGoodEvil = 0.2;
 
         public static readonly double RelationshipIncreaseBetweenGood = 1.5;
+        public static readonly double RelationshipDecreaseRatio = 0.01;
 
         public static readonly double StanceThresholdBetweenGoodEvil = 0.0;
 
         public static readonly double RelationshipRatioToFrequency = 0.3;
 
-        public static readonly double OtherPersonRatio = 1 / 75;
+        public static readonly double OtherPersonRatio = 1.0 / 75;
     }
 }

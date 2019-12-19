@@ -83,8 +83,8 @@ namespace SocialSim.Engine
                 int.TryParse(values[0], out int from);
                 int.TryParse(values[1], out int to);
 
-                double relation = double.Parse(values[1]);
-                double frequency = double.Parse(values[2]);
+                double relation = double.Parse(values[2]);
+                double frequency = double.Parse(values[3]);
 
                 PeopleList[from].AddRelationship(new Relationship(from, to, relation, frequency));
             }
@@ -180,6 +180,8 @@ namespace SocialSim.Engine
         public void Meet(int subjectPersonId)
         {
             var subjectPerson = PeopleList[subjectPersonId];
+            if (!subjectPerson.IsValid)
+                return;
 
             int size = subjectPerson.RelationshipList.Count;
 
@@ -253,7 +255,6 @@ namespace SocialSim.Engine
             }
 
             double rumor = (relationshipToTarget.Frequency) * relationshipUpdateAmount;
-            // TODO : How should we normalize this?
             relationshipToTarget.Relation -= (rumor*4)/PeopleList.Count;
         }
 
