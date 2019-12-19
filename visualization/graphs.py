@@ -4,9 +4,10 @@ import numpy as np
 import pandas as pd
 import copy
 
-##@package visualization
+##@package graphs
 #Convert Output csv file from the main model to pandas DataFrame
 #Draw graph of values through time and scatter graph of several pairs of variables
+#
 #
 
 
