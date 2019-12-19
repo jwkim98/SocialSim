@@ -10,14 +10,14 @@ money=5000              #각 사람 당 Money(Group과 무관)
 selfishvar=[1,1,1]      #각 Group 당 variance for selfishness
 selflessvar=[1,1,1]     #각 Group 당 variance for selflessness
 strvar=[1,1,1]          #각 Group 당 variance for strength
-f=open('data.csv','w')
+f=open('Personal data.csv','w')
 write=csv.writer(f)
 #Personal Data
 for k in range(looptime):
     #Selfishness
     selfishness=np.random.normal(mean[k],selfishvar[k],number[k]) #Selfishness 뽑기
     minselfishness=min(selfishness)
-    if (minselfishness<0):                           #만약 뽑은 데이터 중 음수가 있으면 모든 데이터를 양수로 만들기(Strength는 양수이므로)  
+    if (minselfishness<0):                           #만약 뽑은 데이터 중 음수가 있으면 모든 데이터를 양수로 만들기(Selfishness는 양수이므로)  
         selfishness=selfishness+abs(minselfishness)
     maxselfishness=max(selfishness)   
     selfishness=selfishness/maxselfishness                 #데이터 0~1로 Normalize
@@ -26,7 +26,7 @@ for k in range(looptime):
     #Selflessness
     selflessness=np.random.normal(mean[k],selflessvar[k],number[k]) #Selflessness 뽑기
     minselflessness=min(selflessness)
-    if (minselflessness<0):                           #만약 뽑은 데이터 중 음수가 있으면 모든 데이터를 양수로 만들기(Strength는 양수이므로)  
+    if (minselflessness<0):                           #만약 뽑은 데이터 중 음수가 있으면 모든 데이터를 양수로 만들기(Selflessness는 양수이므로)  
         selflessness=selflessness+abs(minselflessness)
     maxselflessness=max(selflessness)   
     selflessness=selflessness/maxselflessness                 #데이터 0~1로 Normalize
@@ -40,11 +40,10 @@ for k in range(looptime):
     maxstrength=max(strength)   
     strength=strength/maxstrength                 #데이터 0~1로 Normalize
     strength=strength*strengthlimit
+    
 
 
-
-
-    #Personal Data 입력, 사람번호, 이타심, 이기심, money, strength 순
+    #Group ID, Personal ID, 사람번호, 이타심, 이기심, money, strength 순
     for i in range(number[k]):
         if (k==0):
             personid=i
@@ -52,7 +51,7 @@ for k in range(looptime):
             personid=i
             for j in range(k):
                 personid=personid+number[j]
-        write.writerow(["%d" %k, "%d" %personid,"%.3f" %selflessness[i],"%.3f" %selfishness[i],"%d" %money,"%.3f" %strength[i]])
+        write.writerow(["%d" %0, "%d" %personid,"%.3f" %selflessness[i],"%.3f" %selfishness[i],"%d" %money,"%.3f" %strength[i]])
 f.close()
 
 
@@ -66,7 +65,7 @@ f.close()
 
 
 #Relational Data
-g=open('data2.csv','w')
+g=open('Relationship data.csv','w')
 write=csv.writer(g)
 meanforrelationship=0
 relationvar=1  #variance for relationship
@@ -93,18 +92,20 @@ for i in range(totalnumber):
             indexforplus=d
         else:
             indexforplus=numberforindex[groupnumber-1]+d
-        PersonalRelationship[indexforplus]=PersonalRelationship[indexforplus]+plus
+        PersonalRelationship[indexforplus]=PersonalRelationship[indexforplus]         #Better relationship
     maxRelation=abs(PersonalRelationship[0])
     for j in range(totalnumber-1):
         if(abs(PersonalRelationship[j])>maxRelation):
             maxRelation=abs(PersonalRelationship[j])
     PersonalRelationship=PersonalRelationship/maxRelation
     index=0
+
+    # Opportunity to meet person
     for k in range(totalnumber):
         if (k!=i):
             if(groupnumber==0):
                 if (k<number2[0]):
-                    prob=0.7
+                    prob=0.05                      # 0.7
                     write.writerow(["%d" %i, "%d" %k, PersonalRelationship[index],"%.5f" %prob])
                     index=index+1
                 else:
@@ -113,7 +114,7 @@ for i in range(totalnumber):
                     index=index+1
             else:
                 if (k>=number[groupnumber-1] and k<number[groupnumber]):
-                    prob=0.7
+                    prob=0.05                      # 0.7
                     write.writerow(["%d" %i, "%d" %k, PersonalRelationship[index],"%.5f" %prob])
                     index=index+1
                 else:
