@@ -148,6 +148,7 @@ namespace SocialSim.Engine
                     Meet(i);
                 }
 
+
                 for (int i = 0; i < size; ++i)
                 {
                     for (int j = 0; j < size; ++j)
@@ -193,6 +194,9 @@ namespace SocialSim.Engine
                 int targetPersonId = subjectRelationship.To;
                 Person targetPerson = PeopleList[targetPersonId];
 
+                if (!targetPerson.IsValid)
+                    continue;
+
                 Relationship targetRelationship = targetPerson.GetRelationshipTo(subjectPersonId);
 
                 double subjectActionDegree = _simulationModel.ComputeActionDegree(subjectPerson, subjectRelationship);
@@ -226,6 +230,9 @@ namespace SocialSim.Engine
         /// <param name="targetPersonId"></param>
         public void Rumor(int subjectPersonId, int targetPersonId)
         {
+            if (!PeopleList[subjectPersonId].IsValid || !PeopleList[targetPersonId].IsValid)
+                return;
+
             Person subjectPerson = PeopleList[subjectPersonId];
             int relationshipSize = subjectPerson.RelationshipList.Count;
 
@@ -234,13 +241,14 @@ namespace SocialSim.Engine
 
             for (int index = 0; index < relationshipSize; ++index)
             {
-                if (index == targetPersonId)
+                Person targetPerson = PeopleList[subjectPerson.RelationshipList[index].To];
+
+                if (index == targetPersonId || targetPerson.IsValid)
                     continue;
 
-                if (PeopleList[subjectPerson.RelationshipList[index].To].HasRelationship(targetPersonId))
+                if (targetPerson.HasRelationship(targetPersonId))
                 {
-                    relationshipUpdateAmount += PeopleList[subjectPerson.RelationshipList[index].To]
-                        .GetRelationshipTo(targetPersonId).UpdateAmount;
+                    relationshipUpdateAmount += targetPerson.GetRelationshipTo(targetPersonId).UpdateAmount;
                 }
             }
 

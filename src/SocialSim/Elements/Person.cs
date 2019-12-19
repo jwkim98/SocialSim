@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
-using System.Dynamic;
-using System.Text;
-using System.Collections.Concurrent;
-using System.Data.SqlTypes;
 using SocialSim.Model;
 
 namespace SocialSim.Elements
@@ -152,6 +146,11 @@ namespace SocialSim.Elements
         public float Selflessness { get; }
 
         public float Selfishness { get; }
+
+        public bool IsValid
+        {
+            get { return Money>0; }
+        }
 
         public List<Relationship> RelationshipList { get; }
     }
