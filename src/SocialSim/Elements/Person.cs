@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
-using System.Dynamic;
-using System.Text;
-using System.Collections.Concurrent;
-using System.Data.SqlTypes;
 using SocialSim.Model;
 
 namespace SocialSim.Elements
@@ -117,6 +111,30 @@ namespace SocialSim.Elements
             return new Relationship(Id, targetPersonId, 0, 0);
         }
 
+        public Tuple<double, double> GetRelationshipMinMax()
+        {
+            double relationshipMin = double.MaxValue;
+            double relationshipMax = double.MinValue;
+            foreach (Relationship relation in RelationshipList)
+            {
+                if (relation.Relation < relationshipMin)
+                    relationshipMin = relation.Relation;
+                if (relation.Relation > relationshipMax)
+                    relationshipMax = relation.Relation;
+            }
+
+            return new Tuple<double, double>(relationshipMin, relationshipMax);
+        }
+
+        public void NormalizeRelationship(double relationshipMin, double relationshipMax)
+        {
+            foreach (Relationship relationship in RelationshipList)
+            {
+                relationship.Relation =
+                    ((relationship.Relation - relationshipMin) / (relationshipMax - relationshipMin))*2 - 1;
+            }
+        }
+
         public int GroupId { get; }
 
         public int Id { get; }
@@ -128,6 +146,11 @@ namespace SocialSim.Elements
         public float Selflessness { get; }
 
         public float Selfishness { get; }
+
+        public bool IsValid
+        {
+            get { return Money>0; }
+        }
 
         public List<Relationship> RelationshipList { get; }
     }

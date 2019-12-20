@@ -83,8 +83,8 @@ namespace SocialSim.Engine
                 int.TryParse(values[0], out int from);
                 int.TryParse(values[1], out int to);
 
-                double relation = double.Parse(values[1]);
-                double frequency = double.Parse(values[2]);
+                double relation = double.Parse(values[2]);
+                double frequency = double.Parse(values[3]);
 
                 PeopleList[from].AddRelationship(new Relationship(from, to, relation, frequency));
             }
@@ -102,8 +102,8 @@ namespace SocialSim.Engine
             foreach(Person person in PeopleList)
             {
                 var newline = String.Format("{0},{1},{2},{3},{4},{5},{6}", person.GroupId.ToString(), person.Id.ToString(), 
-                    person.Selflessness.ToString(ToString()), person.Selfishness.ToString(ToString()), person.Money.ToString(),
-                    person.Strength.ToString(ToString()), person.Strength.ToString(ToString()));
+                    person.Selflessness.ToString(), person.Selfishness.ToString(), person.Money.ToString(),
+                    person.Strength.ToString(), _getPower(person).ToString());
                 csv.Append(newline + "\n");
             }
             File.WriteAllText(filename, csv.ToString());
@@ -142,10 +142,12 @@ namespace SocialSim.Engine
 
             for (int epoch = 0; epoch < epochs; ++epoch)
             {
+                Console.WriteLine("Epoch :  " +  epoch);
                 for (int i = 0; i < size; ++i)
                 {
                     Meet(i);
                 }
+
 
                 for (int i = 0; i < size; ++i)
                 {
@@ -155,11 +157,16 @@ namespace SocialSim.Engine
                     }
                 }
 
-                if (epochs % writeDuration == 0)
+                NormalizeRelation();
+
+                if (epoch % writeDuration == 0)
                 {
-                    var peopleFilePath = "People_" + (epochs / writeDuration).ToString() + ".csv";
-                    var relationshipFilePath = "Relationship_" + (epochs / writeDuration).ToString() + ".csv";
+                    var peopleFilePath = "People_" + (epoch / writeDuration).ToString() + ".csv";
+                    var relationshipFilePath = "Relationship_" + (epoch / writeDuration).ToString() + ".csv";
                     
+                    Console.WriteLine("PeoplePath: " + peopleFilePath);
+                    Console.WriteLine(" RelationshipPath : " + relationshipFilePath);
+
                     WritePeopleFile(Path.Combine(outputDir, peopleFilePath));
                     WriteRelationshipFile(Path.Combine(outputDir, relationshipFilePath));
                 }
@@ -173,6 +180,8 @@ namespace SocialSim.Engine
         public void Meet(int subjectPersonId)
         {
             var subjectPerson = PeopleList[subjectPersonId];
+            if (!subjectPerson.IsValid)
+                return;
 
             int size = subjectPerson.RelationshipList.Count;
 
@@ -186,6 +195,9 @@ namespace SocialSim.Engine
 
                 int targetPersonId = subjectRelationship.To;
                 Person targetPerson = PeopleList[targetPersonId];
+
+                if (!targetPerson.IsValid)
+                    continue;
 
                 Relationship targetRelationship = targetPerson.GetRelationshipTo(subjectPersonId);
 
@@ -220,6 +232,9 @@ namespace SocialSim.Engine
         /// <param name="targetPersonId"></param>
         public void Rumor(int subjectPersonId, int targetPersonId)
         {
+            if (!PeopleList[subjectPersonId].IsValid || !PeopleList[targetPersonId].IsValid)
+                return;
+
             Person subjectPerson = PeopleList[subjectPersonId];
             int relationshipSize = subjectPerson.RelationshipList.Count;
 
@@ -228,30 +243,49 @@ namespace SocialSim.Engine
 
             for (int index = 0; index < relationshipSize; ++index)
             {
-                if (index == targetPersonId)
+                Person targetPerson = PeopleList[subjectPerson.RelationshipList[index].To];
+
+                if (index == targetPersonId || targetPerson.IsValid)
                     continue;
 
-                if (PeopleList[subjectPerson.RelationshipList[index].To].HasRelationship(targetPersonId))
+                if (targetPerson.HasRelationship(targetPersonId))
                 {
-                    relationshipUpdateAmount += PeopleList[subjectPerson.RelationshipList[index].To]
-                        .GetRelationshipTo(targetPersonId).UpdateAmount;
+                    relationshipUpdateAmount += targetPerson.GetRelationshipTo(targetPersonId).UpdateAmount;
                 }
             }
 
             double rumor = (relationshipToTarget.Frequency) * relationshipUpdateAmount;
-            // TODO : How should we normalize this?
             relationshipToTarget.Relation -= (rumor*4)/PeopleList.Count;
         }
 
         private double _getPower(Person person)
         {
-            double power = 0;
+            double power = person.Strength;
             foreach (var relationship in person.RelationshipList)
             {
-                power += (relationship.Relation + 1) * PeopleList[relationship.To].Strength;
+                power += (relationship.Relation + 1) * PeopleList[relationship.To].Strength
+                *Hyperparameter.OtherPersonRatio;
+            }
+            return power;
+        }
+
+        public void NormalizeRelation()
+        {
+            double relationshipMin = double.MaxValue;
+            double relationshipMax = double.MinValue;
+            foreach (Person person in PeopleList)
+            {
+                var tuple = person.GetRelationshipMinMax();
+                if (relationshipMin > tuple.Item1)
+                    relationshipMin = tuple.Item1;
+                if (relationshipMax < tuple.Item2)
+                    relationshipMax = tuple.Item2;
             }
 
-            return power;
+            foreach (Person person in PeopleList)
+            {
+                person.NormalizeRelationship(relationshipMin, relationshipMax);
+            }
         }
 
         public List<Person> PeopleList { get; set; }
