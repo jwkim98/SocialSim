@@ -1,0 +1,8 @@
+How to use graphs.py
+
+First, locate People_*.csv files and Relation_*.csv files under the folder where graphs.py located.
+Second, run graphs.py. It will require two inputs:Number of Meeting Cycles and Location of data
+Number of Meeting Cycles means it will read People_0.csv, Relation_0.csv to People_n.csv, Relation_n.csv where n is the input. It must be bigger than 5.
+Location of data is location of folder where the csv files are. If it is in the folder "output", then input will be output.
+
+Then the graphs will be shown after few seconds.
