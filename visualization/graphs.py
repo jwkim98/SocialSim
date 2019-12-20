@@ -180,7 +180,7 @@ def main(N, location):
         j = 5*i+4
         axs6[i%2, i//2].scatter(pow_rel[j]["average"], people[i]["Money"])
         axs6[i%2, i//2].set_title("epoch {}".format((i+1)*5))
-        axs6[i%2, i//2].set(xlabel = "Selfishness-Selflessness",ylabel = "Average of Relation")
+        axs6[i%2, i//2].set(xlabel = "Average of Relation",ylabel = "Money")
         axs6[i%2, i//2].label_outer()    
     plt.show()
     
