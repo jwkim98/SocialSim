@@ -80,8 +80,8 @@ for a in range(looptime):
     if (a!=0):
         numberforindex[a]=numberforindex[a]+number[a-1]
 for i in range(totalnumber):
-    #Make Relationship per Person
-    PersonalRelationship=np.random.normal(meanforrelationship,relationvar,totalnumber-1)
+    #Make Relationship per Person,  
+    PersonalRelationship=np.random.normal(meanforrelationship,relationvar,totalnumber-1)  # Relationship 난수 생성, 후에 (-1,1)로 Normalize
     c=0
     groupnumber=0
     while(i>=numberforindex[c]):
